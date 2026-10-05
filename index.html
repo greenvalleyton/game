@@ -168,8 +168,7 @@ svg { display: block; width: 100%; height: 100%; }
   <section class="scene">
     <div class="art" id="scene"></div>
     <h1>Green Valley</h1>
-    <div class="who" id="who">Prototype · no blockchain</div>
-    <div class="speed" role="group" aria-label="Time speed" id="speed"></div>
+    <div class="who" id="who">My farm</div>
   </section>
 
   <header class="hud">
@@ -386,6 +385,7 @@ window.SPR = (function () {
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
   const now = () => S.clock.game + (Date.now() - S.clock.real) * S.speed;
   const setSpeed = sp => { const g = now(); S.clock = { real: Date.now(), game: g }; S.speed = sp; };
+  if (S.speed !== 60) { setSpeed(60); save(); } // fixed game speed (switch removed)
 
   // ---------- telegram ----------
   const TG = window.Telegram && window.Telegram.WebApp;
@@ -443,7 +443,6 @@ window.SPR = (function () {
   // ---------- actions (return false to skip re-render) ----------
   const A = {
     tab(el) { S.tab = el.dataset.tab; window.scrollTo(0, 0); },
-    speed(el) { setSpeed(+el.dataset.sp); },
     eat(el) {
       const n = +el.dataset.n;
       if (S.energy >= 500) return toast('Energy is already full');
@@ -681,7 +680,6 @@ window.SPR = (function () {
     document.getElementById('r-gold').textContent = fmtN(S.gold);
     document.getElementById('r-energy').textContent = Math.floor(S.energy) + ' / 500';
     document.getElementById('r-ebar').style.width = S.energy / 5 + '%';
-    document.getElementById('speed').innerHTML = [1, 60, 600].map(sp => `<button data-act="speed" data-sp="${sp}" aria-pressed="${S.speed === sp}" title="${sp === 1 ? 'Real time' : '1 game hour = ' + 60 / sp + ' min'}">×${sp}</button>`).join('');
     document.getElementById('tabs').innerHTML = TABS.map(([k, n, s]) => `<button role="tab" data-act="tab" data-tab="${k}" aria-selected="${S.tab === k}">${ic(s)}<span>${n}</span></button>`).join('');
   }
   let sig = '';
