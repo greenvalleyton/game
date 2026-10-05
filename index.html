@@ -392,6 +392,23 @@ window.SPR = (function () {
   if (TG) { try { TG.ready(); TG.expand(); const u = TG.initDataUnsafe && TG.initDataUnsafe.user; if (u && u.first_name) document.getElementById('who').textContent = u.first_name + "'s farm"; } catch (e) {} }
   const haptic = k => { try { TG && TG.HapticFeedback && TG.HapticFeedback.notificationOccurred(k); } catch (e) {} };
 
+  // ---------- Early Farmers check-in (bot server) ----------
+  const API = 'https://green-valley-bot.greenvalley-game.workers.dev'; // bot server address, e.g. https://green-valley-bot.NAME.workers.dev
+  function earlyCheckin() {
+    if (!API || !TG || !TG.initData) return;
+    fetch(API + '/api/checkin', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ initData: TG.initData }) })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (!d || !d.status) return;
+        const s = d.status, u = TG.initDataUnsafe && TG.initDataUnsafe.user;
+        document.getElementById('who').textContent = (u && u.first_name ? u.first_name + "'s farm" : 'My farm') + ' · 🌱 ' + s.seeds + (s.early ? ' · ✅ Early Farmer' : '');
+        if (d.becameEarly) setTimeout(() => toast('🎉 You are now an Early Farmer!', false, 5000), 400);
+        else if (d.newDay) { const extra = s.early ? '' : ' · Early Farmer ' + s.earlyProgress + '/' + s.earlyNeed + (s.subscribed ? '' : ', subscribe to @GreenValley_TON'); setTimeout(() => toast('🌱 +' + d.earned + ' Seeds · day ' + s.days + extra, false, 5000), 400); }
+      })
+      .catch(() => {});
+  }
+  setTimeout(earlyCheckin, 600);
+
   // ---------- helpers ----------
   const fmtN = n => (Math.round(n * 10) / 10).toLocaleString('en-US');
   function fmtDur(ms) {
@@ -400,10 +417,10 @@ window.SPR = (function () {
     return h ? `${h}h ${m}m` : m ? `${m}:${String(x).padStart(2, '0')}` : `${x}s`;
   }
   let tT;
-  function toast(msg, bad) {
+  function toast(msg, bad, ms) {
     const el = document.getElementById('toast');
     el.textContent = msg; el.className = 'toast' + (bad ? ' bad' : ''); el.hidden = false;
-    clearTimeout(tT); tT = setTimeout(() => { el.hidden = true; }, 2200); haptic(bad ? 'error' : 'success');
+    clearTimeout(tT); tT = setTimeout(() => { el.hidden = true; }, ms || 2200); haptic(bad ? 'error' : 'success');
   }
   function floatAt(el, txt, k) {
     if (!el) return;
