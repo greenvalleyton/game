@@ -381,14 +381,64 @@ window.SPR = (function () {
   }
   const KEY = 'green-valley-proto-v2';
   let S; try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
-  if (!S || S.v !== 2) S = fresh();
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+  let isFresh = false;
+  if (!S || S.v !== 2) { S = fresh(); isFresh = true; }
+  const localLegacy = !S.savedAt; // saved before cloud sync existed
+  const localSavedAt = S.savedAt || 0;
+  let cloudReady = false, cloudPushed = '', cloudTimer = null;
+  const save = () => { S.savedAt = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} cloudSave(); };
+  function cloudSave(force) {
+    if (!cloudReady || !CS) return;
+    const body = JSON.stringify(Object.assign({}, S, { savedAt: 0 }));
+    if (body === cloudPushed) return;
+    if (cloudTimer && !force) return;
+    const push = () => {
+      cloudTimer = null;
+      const json = JSON.stringify(S), parts = [];
+      for (let i = 0; i < json.length; i += 4000) parts.push(json.slice(i, i + 4000));
+      try {
+        parts.forEach((p, i) => CS.setItem('gv_' + i, p));
+        CS.setItem('gv_n', String(parts.length));
+        cloudPushed = body;
+      } catch (e) {}
+    };
+    if (force) { clearTimeout(cloudTimer); push(); } else cloudTimer = setTimeout(push, 8000);
+  }
   const now = () => S.clock.game + (Date.now() - S.clock.real) * S.speed;
   const setSpeed = sp => { const g = now(); S.clock = { real: Date.now(), game: g }; S.speed = sp; };
   if (S.speed !== 10) { setSpeed(10); save(); } // fixed game speed (switch removed)
 
   // ---------- telegram ----------
   const TG = window.Telegram && window.Telegram.WebApp;
+  const CS = (TG && TG.CloudStorage && TG.isVersionAtLeast && TG.isVersionAtLeast('6.9')) ? TG.CloudStorage : null;
+  // ---------- cloud sync: one farm on every device ----------
+  const score = s => (s.stats && s.stats.goldMined || 0) + (s.tools || []).length * 100 + (s.beds || []).length * 30 + (s.hens || []).length * 30 + (s.wood || 0) / 20 + (s.food || 0) / 20 + (s.gold || 0) / 5;
+  function cloudLoad() {
+    if (!CS) return;
+    const done = () => { cloudReady = true; cloudSave(true); };
+    try {
+      CS.getItem('gv_n', (err, n) => {
+        n = parseInt(n, 10);
+        if (err || !n) return done();
+        const keys = []; for (let i = 0; i < n; i++) keys.push('gv_' + i);
+        CS.getItems(keys, (err2, vals) => {
+          let C = null;
+          try { if (!err2) C = JSON.parse(keys.map(k => vals[k] || '').join('')); } catch (e) { C = null; }
+          if (C && C.v === 2) {
+            const useCloud = isFresh || (localLegacy ? score(C) > score(S) : (C.savedAt || 0) > localSavedAt);
+            if (useCloud) {
+              S = C;
+              if (S.speed !== 10) setSpeed(10);
+              try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+              render();
+            }
+          }
+          done();
+        });
+      });
+    } catch (e) { done(); }
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') cloudSave(true); });
   if (TG) { try { TG.ready(); TG.expand(); const u = TG.initDataUnsafe && TG.initDataUnsafe.user; if (u && u.first_name) document.getElementById('who').textContent = u.first_name + "'s farm"; } catch (e) {} }
   const haptic = k => { try { TG && TG.HapticFeedback && TG.HapticFeedback.notificationOccurred(k); } catch (e) {} };
 
@@ -721,6 +771,7 @@ window.SPR = (function () {
   });
 
   render();
+  cloudLoad();
   setInterval(tick, 500);
   setInterval(save, 5000);
 })();
