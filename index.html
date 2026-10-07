@@ -414,8 +414,9 @@ window.SPR = (function () {
   // ---------- cloud sync: one farm on every device ----------
   const score = s => (s.stats && s.stats.goldMined || 0) + (s.tools || []).length * 100 + (s.beds || []).length * 30 + (s.hens || []).length * 30 + (s.wood || 0) / 20 + (s.food || 0) / 20 + (s.gold || 0) / 5;
   function cloudLoad() {
-    if (!CS) return;
-    const done = () => { cloudReady = true; cloudSave(true); };
+    if (!CS) { if (TG && TG.initData) setTimeout(() => toast('Cloud sync is not available in this Telegram version (' + (TG.version || '?') + ')', true), 1200); return; }
+    let msg = 'Farm saved to cloud';
+    const done = () => { cloudReady = true; cloudSave(true); setTimeout(() => toast('☁ ' + msg), 800); };
     try {
       CS.getItem('gv_n', (err, n) => {
         n = parseInt(n, 10);
@@ -431,7 +432,8 @@ window.SPR = (function () {
               if (S.speed !== 10) setSpeed(10);
               try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
               render();
-            }
+              msg = 'Farm loaded from cloud';
+            } else msg = 'Farm synced';
           }
           done();
         });
