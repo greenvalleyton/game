@@ -373,7 +373,7 @@ window.SPR = (function () {
   const uid = () => 'u' + Date.now().toString(36) + (seq++);
   function fresh() {
     const t = Date.now();
-    return { v: 2, tab: 'farm', speed: 60, clock: { real: t, game: t },
+    return { v: 2, tab: 'farm', speed: 10, clock: { real: t, game: t },
       wood: 320, food: 60, gold: 210, energy: 300,
       tools: [{ uid: uid(), type: 'oldaxe', dur: 0, start: null }, { uid: uid(), type: 'axe', dur: 200, start: null }, { uid: uid(), type: 'rod', dur: 200, start: null }, { uid: uid(), type: 'pick', dur: 300, start: null }],
       beds: [], coop: { paid: false, steps: 0, lastStep: null }, hens: [], rareSeeds: 0, member: null, wallet: false,
@@ -385,7 +385,7 @@ window.SPR = (function () {
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
   const now = () => S.clock.game + (Date.now() - S.clock.real) * S.speed;
   const setSpeed = sp => { const g = now(); S.clock = { real: Date.now(), game: g }; S.speed = sp; };
-  if (S.speed !== 60) { setSpeed(60); save(); } // fixed game speed (switch removed)
+  if (S.speed !== 10) { setSpeed(10); save(); } // fixed game speed (switch removed)
 
   // ---------- telegram ----------
   const TG = window.Telegram && window.Telegram.WebApp;
