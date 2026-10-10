@@ -177,6 +177,11 @@ svg { display: block; width: 100%; height: 100%; }
 
 /* Next goal */
 .goal { padding: 10px 12px; display: flex; flex-direction: column; gap: 7px; }
+/* Valley Guard promo */
+.vg-promo { background: linear-gradient(135deg, #2c4a37, #1d3326); color: #f3ead2; }
+.vg-promo .goal-k { background: #c9861c; }
+.vg-promo p { margin: 0; font-size: 13px; line-height: 1.35; }
+.vg-promo .vg-x { background: none; border: 0; color: inherit; font-size: 16px; padding: 2px 4px; cursor: pointer; opacity: .7; }
 .goal-head { display: flex; align-items: center; gap: 8px; }
 .goal-head b { flex: 1; font: 15px/1.15 var(--font-display); }
 .goal-k { font: 10px var(--font-display); text-transform: uppercase; letter-spacing: .05em; color: #fff; background: var(--green-d); border: 2px solid var(--ink); border-radius: 6px; padding: 2px 6px; }
@@ -611,6 +616,12 @@ window.SPR = (function () {
       floatAt(el, '+' + amt, d.res); flyTo(from, d.res, amt); haptic('success');
     },
     goal(el) { S.tab = el.dataset.tab; window.scrollTo(0, 0); },
+    vgOpen() {
+      const link = 'https://t.me/ValleyGuard_bot/play?startapp=gv';
+      try { TG && TG.openTelegramLink ? TG.openTelegramLink(link) : window.open(link, '_blank'); } catch (e) { window.open(link, '_blank'); }
+      return false;
+    },
+    vgHide() { S.vgHidden = true; save(); },
     startAll() {
       let n = 0;
       S.tools.forEach(t => { const d = TOOLS[t.type]; if (t.start == null && (!d.wear || t.dur >= d.wear) && S.energy >= d.energy) { S.energy -= d.energy; t.dur -= d.wear; t.start = now(); t.len = cycleLen(t); n++; } });
@@ -740,10 +751,14 @@ window.SPR = (function () {
       <div class="acts">${d.wear ? `<button class="btn sm" data-act="repair" data-id="${t.uid}" ${t.dur >= d.dur ? 'disabled' : ''} title="Repair: 1 gold per 4 durability"><span class="ico">${SPR.wrench()}</span>${cost || ''}</button>` : ''}${main}</div>
     </article>`;
   }
+  // Cross-promo: the second game in the same world
+  const vgPromo = () => S.vgHidden ? '' : `<div class="paper goal vg-promo"><div class="goal-head"><span class="goal-k">New game</span><b>Valley Guard</b><button class="vg-x" data-act="vgHide" aria-label="Hide">✕</button></div>
+      <p>Pests and bosses are coming for the valley. Hold the fence, beat a boss every 10 waves. Closed beta: 300 spots for Green Valley farmers.</p>
+      <button class="btn sm go" data-act="vgOpen">🛡 Play Valley Guard</button></div>`;
   const sign = (title, sub) => `<div class="sign"><h2>${title}</h2>${sub ? `<small>${sub}</small>` : ''}</div>`;
 
   function vFarm() {
-    return `${goalCard()}${sign('Tools', S.tools.length + ' / ' + slots() + ' slots')}
+    return `${goalCard()}${vgPromo()}${sign('Tools', S.tools.length + ' / ' + slots() + ' slots')}
       <div class="bar-row"><button class="btn sm" data-act="startAll">Start all</button><button class="btn sm take" data-act="collectAll">Collect all</button></div>
       <div class="grid">${S.tools.map(toolCard).join('')}</div>
       <p class="tip">Finished work waits for you, but cycles don't stack. Repairs cost 1 gold per 4 durability. While tools work, watch for ✨ lucky finds. This test version runs ${S.speed}× faster than the real game.</p>`;
