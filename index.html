@@ -119,9 +119,70 @@ svg { display: block; width: 100%; height: 100%; }
 .acts .btn:last-child { flex: 1; }
 .sub { font-size: 12px; color: var(--muted); font-weight: 500; }
 
-/* Working tool animation */
+/* Working tool animation: every tool moves its own way */
 .working .spr { animation: swing .7s ease-in-out infinite alternate; transform-origin: 30% 80%; }
 @keyframes swing { from { transform: rotate(-14deg); } to { transform: rotate(10deg); } }
+.tool-axe.working .spr, .tool-oldaxe.working .spr { animation: chop .9s cubic-bezier(.5,0,.2,1) infinite; transform-origin: 25% 85%; }
+@keyframes chop { 0% { transform: rotate(-38deg); } 55% { transform: rotate(-38deg); } 70% { transform: rotate(14deg); } 78% { transform: rotate(8deg); } 100% { transform: rotate(-38deg); } }
+.tool-saw.working .spr { animation: saw .32s ease-in-out infinite alternate; transform-origin: 50% 50%; }
+@keyframes saw { from { transform: translateX(-9%) rotate(-4deg); } to { transform: translateX(9%) rotate(-4deg); } }
+.tool-rod.working .spr { animation: cast 2.4s ease-in-out infinite; transform-origin: 20% 90%; }
+@keyframes cast { 0%,100% { transform: rotate(-6deg); } 40% { transform: rotate(4deg); } 46% { transform: rotate(-2deg) translateY(3px); } 52% { transform: rotate(5deg); } }
+.tool-net.working .spr { animation: sway 1.6s ease-in-out infinite alternate; transform-origin: 50% 10%; }
+@keyframes sway { from { transform: rotate(-10deg); } to { transform: rotate(10deg); } }
+.tool-pick.working .spr { animation: strike .75s cubic-bezier(.6,0,.3,1) infinite; transform-origin: 30% 85%; }
+@keyframes strike { 0% { transform: rotate(-30deg); } 60% { transform: rotate(-30deg); } 72% { transform: rotate(18deg); } 80% { transform: rotate(12deg); } 100% { transform: rotate(-30deg); } }
+.tool-drill.working .spr { animation: drill .09s linear infinite alternate; }
+@keyframes drill { from { transform: translate(-1.5px, 1px) rotate(-1deg); } to { transform: translate(1.5px, -1px) rotate(1deg); } }
+
+/* Particles: chips, ripples, sparks */
+.fx { position: absolute; inset: 0; pointer-events: none; }
+.fx b { position: absolute; left: 58%; top: 62%; width: 7px; height: 5px; border-radius: 2px; background: #c98a3a; border: 1.5px solid var(--ink); opacity: 0; }
+.fx b:nth-child(2) { --x: -26px; --y: -30px; animation-delay: .12s !important; }
+.fx b:nth-child(3) { --x: 22px; --y: -36px; animation-delay: .24s !important; }
+.fx b:nth-child(4) { --x: -12px; --y: -44px; animation-delay: .36s !important; }
+.fx b:nth-child(5) { --x: 30px; --y: -20px; animation-delay: .48s !important; }
+.fx b { --x: -34px; --y: -18px; }
+.tool-axe .fx b, .tool-oldaxe .fx b { animation: chip .9s ease-out infinite; animation-delay: .62s; }
+@keyframes chip { 0%,60% { opacity: 0; transform: translate(0,0) rotate(0); } 64% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(200deg); } }
+.tool-saw .fx b { width: 4px; height: 4px; border-radius: 50%; background: #e8c48a; border-width: 1px; top: 56%; animation: dust .64s linear infinite; }
+@keyframes dust { 0% { opacity: 1; transform: translate(0,0); } 100% { opacity: 0; transform: translate(calc(var(--x) * .4), 34px); } }
+.tool-rod .fx b, .tool-net .fx b { left: 50%; top: 82%; width: 18px; height: 6px; margin-left: -9px; border-radius: 50%; background: none; border: 2px solid #fff; animation: ripple 2.4s ease-out infinite; }
+.tool-rod .fx b:nth-child(n+3), .tool-net .fx b:nth-child(n+3) { display: none; }
+.tool-rod .fx b:nth-child(2), .tool-net .fx b:nth-child(2) { animation-delay: 1.2s !important; }
+@keyframes ripple { 0% { opacity: .9; transform: scale(.4); } 100% { opacity: 0; transform: scale(3); } }
+.tool-pick .fx b, .tool-drill .fx b { width: 5px; height: 5px; border-radius: 50%; background: var(--yellow-l); border: 1px solid #b06a00; box-shadow: 0 0 6px #ffd45e; }
+.tool-pick .fx b { animation: spark .75s ease-out infinite; animation-delay: .52s; }
+.tool-drill .fx b { animation: spark .45s ease-out infinite; }
+@keyframes spark { 0%,40% { opacity: 0; transform: translate(0,0) scale(1); } 45% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(.4); } }
+
+/* Rarity you can see */
+.window.tier-rare { box-shadow: inset 0 0 0 3px rgba(58,111,196,.55), inset 0 0 18px rgba(58,111,196,.45); }
+.window.tier-epic { box-shadow: inset 0 0 0 3px rgba(138,63,196,.6), inset 0 0 22px rgba(138,63,196,.55); }
+.window.tier-epic::before { content: ""; position: absolute; inset: -40%; background: conic-gradient(from 0deg, transparent 0 70%, rgba(255,255,255,.45) 80%, transparent 90%); animation: shine 4s linear infinite; pointer-events: none; }
+@keyframes shine { to { transform: rotate(360deg); } }
+.fast { position: absolute; left: 6px; bottom: 6px; font: 10px var(--font-display); background: #fff3c4; border: 2px solid var(--ink); border-radius: 6px; padding: 1px 5px; }
+
+/* Lucky find */
+.lucky { position: absolute; right: 8px; bottom: 8px; display: flex; flex-direction: column; align-items: center; gap: 0; background: var(--yellow-l); border: 2px solid var(--ink); border-radius: 12px; padding: 2px 7px 3px; font: 18px/1 var(--font-display); box-shadow: 0 3px 0 var(--ink), 0 0 14px #fff6a8; animation: pop .5s ease-out, glow 1s ease-in-out .5s infinite alternate; z-index: 2; }
+.lucky small { font: 9px var(--font-display); }
+@keyframes pop { from { transform: scale(0); } 70% { transform: scale(1.2); } to { transform: scale(1); } }
+@keyframes glow { to { transform: translateY(-3px); box-shadow: 0 6px 0 var(--ink), 0 0 22px #fff6a8; } }
+
+/* Flying resources and counter pulse */
+.fly { position: fixed; z-index: 11; width: 30px; height: 30px; margin: -15px 0 0 -15px; pointer-events: none; animation: fly .8s cubic-bezier(.4,0,.6,1) forwards; }
+@keyframes fly { 0% { transform: translate(0,0) scale(.6); opacity: 0; } 15% { opacity: 1; transform: translate(0, var(--arc)) scale(1.1); } 100% { transform: translate(var(--dx), var(--dy)) scale(.55); opacity: .9; } }
+.pill.pulse { animation: pulse .35s ease-out; }
+@keyframes pulse { 50% { transform: scale(1.12); background: #fff6d0; } }
+
+/* Next goal */
+.goal { padding: 10px 12px; display: flex; flex-direction: column; gap: 7px; }
+.goal-head { display: flex; align-items: center; gap: 8px; }
+.goal-head b { flex: 1; font: 15px/1.15 var(--font-display); }
+.goal-k { font: 10px var(--font-display); text-transform: uppercase; letter-spacing: .05em; color: #fff; background: var(--green-d); border: 2px solid var(--ink); border-radius: 6px; padding: 2px 6px; }
+.goal-row { display: grid; grid-template-columns: 22px 1fr; gap: 6px; align-items: center; }
+.goal-row .i { width: 22px; height: 22px; }
+.ready-goal { animation: bob 1s ease-in-out infinite alternate; }
 .ready .spr { animation: bob 1s ease-in-out infinite alternate; }
 @keyframes bob { to { transform: translateY(-5px); } }
 .ready .window::after { content: "!"; position: absolute; right: 8px; bottom: 6px; width: 26px; height: 26px; display: grid; place-items: center; background: var(--green); color: #fff; font: 16px var(--font-display); border: 2px solid var(--ink); border-radius: 50%; }
@@ -375,7 +436,7 @@ window.SPR = (function () {
     const t = Date.now();
     return { v: 2, tab: 'farm', speed: 10, clock: { real: t, game: t },
       wood: 320, food: 60, gold: 210, energy: 300,
-      tools: [{ uid: uid(), type: 'oldaxe', dur: 0, start: null }, { uid: uid(), type: 'axe', dur: 200, start: null }, { uid: uid(), type: 'rod', dur: 200, start: null }, { uid: uid(), type: 'pick', dur: 300, start: null }],
+      tools: [{ uid: uid(), type: 'oldaxe', dur: 0, start: null, runs: 0 }, { uid: uid(), type: 'axe', dur: 200, start: null, runs: 0 }, { uid: uid(), type: 'rod', dur: 200, start: null, runs: 0 }, { uid: uid(), type: 'pick', dur: 300, start: null, runs: 0 }],
       beds: [], coop: { paid: false, steps: 0, lastStep: null }, hens: [], rareSeeds: 0, member: null, wallet: false,
       stats: { revenue: 70, goldMined: 0, goldBurned: 0 } };
   }
@@ -383,6 +444,9 @@ window.SPR = (function () {
   let S; try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
   let isFresh = false;
   if (!S || S.v !== 2) { S = fresh(); isFresh = true; }
+  const migrate = st => { (st.tools || []).forEach(t => { if (t.runs == null) t.runs = RAMP_DONE; }); return st; };
+  const RAMP_DONE = 3;
+  migrate(S);
   const localLegacy = !S.savedAt; // saved before cloud sync existed
   const localSavedAt = S.savedAt || 0;
   let cloudReady = false, cloudPushed = '', cloudTimer = null;
@@ -428,7 +492,7 @@ window.SPR = (function () {
           if (C && C.v === 2) {
             const useCloud = isFresh || (localLegacy ? score(C) > score(S) : (C.savedAt || 0) > localSavedAt);
             if (useCloud) {
-              S = C;
+              S = migrate(C);
               if (S.speed !== 10) setSpeed(10);
               try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
               render();
@@ -463,8 +527,10 @@ window.SPR = (function () {
 
   // ---------- helpers ----------
   const fmtN = n => (Math.round(n * 10) / 10).toLocaleString('en-US');
+  // All durations in the state are game time (the prototype runs S.speed× faster); show players real time.
   function fmtDur(ms) {
     if (ms <= 0) return 'done';
+    ms = ms / (S.speed || 1);
     const s = Math.ceil(ms / 1000), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60;
     return h ? `${h}h ${m}m` : m ? `${m}:${String(x).padStart(2, '0')}` : `${x}s`;
   }
@@ -484,10 +550,16 @@ window.SPR = (function () {
   const memberActive = () => (S.member && S.member.until > now() ? MEMBER[S.member.level] : null);
   const slots = () => (memberActive() ? memberActive().slots : SLOTS);
   const bonus = () => (memberActive() ? memberActive().bonus : 0);
+  // Fast start: the first cycles of every new wood/food tool are short, so a new player sees the loop in the first minute.
+  // Gold tools are never sped up.
+  const RAMP = [1 / 12, 1 / 6, 1 / 3];
+  const cycleLen = t => { const d = TOOLS[t.type]; return d.cycle * H * (d.res !== 'gold' && (t.runs || 0) < RAMP.length ? RAMP[t.runs || 0] : 1); };
+  const fmtCycle = ms => { const sec = ms / (S.speed || 1) / 1000, m = Math.round(sec / 60); return sec < 60 ? Math.round(sec) + 's' : m >= 60 ? (m % 60 ? (m / 60).toFixed(1) + 'h' : m / 60 + 'h') : m + 'm'; };
+  const perHour = d => Math.round(d.yield * H / (d.cycle * H / (S.speed || 1)));
   function toolState(t) {
     const d = TOOLS[t.type];
     if (t.start == null) return { st: 'idle', left: 0, pct: 0 };
-    const el = now() - t.start, total = d.cycle * H;
+    const el = now() - t.start, total = t.len || d.cycle * H;
     return el >= total ? { st: 'ready', left: 0, pct: 100 } : { st: 'work', left: total - el, pct: el / total * 100 };
   }
   const burn = n => { S.gold -= n; S.stats.goldBurned += n; };
@@ -513,19 +585,35 @@ window.SPR = (function () {
       if (t.start != null) return;
       if (d.wear && t.dur < d.wear) return toast('This tool is broken. Repair it first', true);
       if (S.energy < d.energy) return toast('Not enough energy. Tap Eat', true);
-      S.energy -= d.energy; t.dur -= d.wear; t.start = now();
+      S.energy -= d.energy; t.dur -= d.wear; t.start = now(); t.len = cycleLen(t);
     },
-    collect(el) { collect(S.tools.find(x => x.uid === el.dataset.id), el); },
+    collect(el) {
+      const card = el.closest('.card'), from = (card && card.querySelector('.window') || el).getBoundingClientRect();
+      const r = collect(S.tools.find(x => x.uid === el.dataset.id), el);
+      if (r.amt) flyTo(from, r.res, r.amt);
+    },
     collectAll(el) {
       const got = { wood: 0, food: 0, gold: 0 }; let n = 0;
-      S.tools.forEach(t => { if (toolState(t).st === 'ready') { const r = collect(t); got[r.res] += r.amt; n++; } });
+      S.tools.forEach(t => { if (toolState(t).st === 'ready') {
+        const w = document.querySelector(`[data-prog="${t.uid}"]`), c = w && w.closest('.card'), from = c ? c.querySelector('.window').getBoundingClientRect() : el.getBoundingClientRect();
+        const r = collect(t); got[r.res] += r.amt; n++; setTimeout(() => flyTo(from, r.res, r.amt), n * 120);
+      } });
       if (!n) return toast('Nothing to collect yet', true);
       const rr = el.getBoundingClientRect(), anchor = { getBoundingClientRect: () => rr };
       Object.keys(got).filter(k => got[k]).forEach((k, i) => setTimeout(() => floatAt(anchor, '+' + fmtN(got[k]), k), i * 220));
     },
+    lucky(el) {
+      const t = S.tools.find(x => x.uid === el.dataset.id);
+      if (!lucky || !t || lucky.uid !== t.uid) return;
+      const d = TOOLS[t.type], amt = Math.max(1, Math.round(d.yield * 0.3));
+      const from = el.getBoundingClientRect();
+      S[d.res] += amt; lucky = null; nextLucky = Date.now() + 60000 + Math.random() * 60000;
+      floatAt(el, '+' + amt, d.res); flyTo(from, d.res, amt); haptic('success');
+    },
+    goal(el) { S.tab = el.dataset.tab; window.scrollTo(0, 0); },
     startAll() {
       let n = 0;
-      S.tools.forEach(t => { const d = TOOLS[t.type]; if (t.start == null && (!d.wear || t.dur >= d.wear) && S.energy >= d.energy) { S.energy -= d.energy; t.dur -= d.wear; t.start = now(); n++; } });
+      S.tools.forEach(t => { const d = TOOLS[t.type]; if (t.start == null && (!d.wear || t.dur >= d.wear) && S.energy >= d.energy) { S.energy -= d.energy; t.dur -= d.wear; t.start = now(); t.len = cycleLen(t); n++; } });
       toast(n ? 'Started ' + n + (n === 1 ? ' tool' : ' tools') : 'Nothing to start: you need energy or repairs', !n);
     },
     repair(el) {
@@ -537,7 +625,7 @@ window.SPR = (function () {
     buyTool(el) {
       const type = el.dataset.type;
       if (S.tools.length >= slots()) return toast('All slots are taken. A membership adds more', true);
-      S.tools.push({ uid: uid(), type, dur: TOOLS[type].dur, start: null }); S.stats.revenue += TOOLS[type].price;
+      S.tools.push({ uid: uid(), type, dur: TOOLS[type].dur, start: null, runs: 0 }); S.stats.revenue += TOOLS[type].price;
       toast(TOOLS[type].name + ' added to your farm');
     },
     buyMember(el) { const lv = el.dataset.lv; S.member = { level: lv, until: now() + 30 * 24 * H }; S.stats.revenue += MEMBER[lv].price; toast(MEMBER[lv].name + ' membership active for 30 days'); },
@@ -578,9 +666,58 @@ window.SPR = (function () {
     if (toolState(t).st !== 'ready') return { res: 'wood', amt: 0 };
     const d = TOOLS[t.type];
     const amt = Math.round(d.yield * (1 + bonus()) * (d.res === 'gold' ? K : 1) * 10) / 10;
-    S[d.res] += amt; if (d.res === 'gold') S.stats.goldMined += amt; t.start = null;
+    S[d.res] += amt; if (d.res === 'gold') S.stats.goldMined += amt; t.start = null; t.len = null; t.runs = (t.runs || 0) + 1;
+    if (lucky && lucky.uid === t.uid) lucky = null;
     if (el) floatAt(el, '+' + fmtN(amt), d.res);
+    try { TG && TG.HapticFeedback && TG.HapticFeedback.impactOccurred('medium'); } catch (e) {}
     return { res: d.res, amt };
+  }
+
+  // ---------- juice: resources fly from the tool into the counter ----------
+  function flyTo(from, res, amt) {
+    const pill = document.getElementById('r-' + res); if (!pill || !from) return;
+    const to = pill.closest('.pill').getBoundingClientRect(), n = Math.min(8, 3 + Math.floor(Math.log2(1 + amt)));
+    for (let i = 0; i < n; i++) {
+      const f = document.createElement('div'); f.className = 'fly'; f.innerHTML = spr(res);
+      const sx = from.left + from.width / 2 + (Math.random() - .5) * from.width * .5, sy = from.top + from.height / 2 + (Math.random() - .5) * from.height * .4;
+      const ex = to.left + 18, ey = to.top + to.height / 2;
+      f.style.left = sx + 'px'; f.style.top = sy + 'px';
+      f.style.setProperty('--dx', (ex - sx) + 'px'); f.style.setProperty('--dy', (ey - sy) + 'px');
+      f.style.setProperty('--arc', (-40 - Math.random() * 50) + 'px'); f.style.animationDelay = (i * 55) + 'ms';
+      document.body.appendChild(f); setTimeout(() => f.remove(), 900 + i * 55);
+    }
+    setTimeout(() => { const p = pill.closest('.pill'); p.classList.remove('pulse'); void p.offsetWidth; p.classList.add('pulse'); }, 650);
+  }
+
+  // ---------- lucky finds: something to tap while tools work ----------
+  let lucky = null, nextLucky = Date.now() + 25000;
+  function luckyTick() {
+    const t = Date.now();
+    if (lucky && t > lucky.until) { lucky = null; nextLucky = t + 45000 + Math.random() * 45000; }
+    if (!lucky && t > nextLucky) {
+      const pool = S.tools.filter(x => TOOLS[x.type].res !== 'gold' && toolState(x).st === 'work');
+      if (pool.length) { lucky = { uid: pool[Math.floor(Math.random() * pool.length)].uid, until: t + 20000 }; }
+      else nextLucky = t + 10000;
+    }
+  }
+  const LUCKY_TXT = { wood: 'Thick branch!', food: 'Big catch!' };
+
+  // ---------- next goal: always show what to save up for ----------
+  function nextGoal() {
+    const c = S.coop;
+    if (!S.beds.length) return { tab: 'garden', title: 'Build your first plot', need: [['wood', 300], ['gold', 50]] };
+    if (!c.paid) return { tab: 'garden', title: 'Build the chicken coop', need: [['wood', 1500], ['gold', 300]] };
+    if (c.steps < 8) return { tab: 'garden', title: 'Finish the coop: step ' + (c.steps + 1) + ' of 8', need: [] };
+    if (S.beds.length < 4) return { tab: 'garden', title: 'Plot ' + (S.beds.length + 1) + ' of 4', need: [['wood', 300], ['gold', 50]] };
+    return { tab: 'garden', title: 'Fill the coop: ' + S.hens.length + ' / 10 hens', need: [] , pct: S.hens.length * 10 };
+  }
+  function goalCard() {
+    const g = nextGoal();
+    const rows = g.need.map(([k, n]) => `<div class="goal-row">${ic(k)}<div class="meter"><i style="width:${Math.min(100, S[k] / n * 100)}%"></i><span>${fmtN(Math.min(S[k], n))} / ${fmtN(n)}</span></div></div>`).join('')
+      || (g.pct != null ? `<div class="meter"><i style="width:${g.pct}%"></i></div>` : '');
+    const ready = g.need.length && g.need.every(([k, n]) => S[k] >= n);
+    return `<div class="paper goal ${ready ? 'ready-goal' : ''}"><div class="goal-head"><span class="goal-k">Next goal</span><b>${g.title}</b>
+      <button class="btn sm ${ready || !g.need.length ? 'go' : ''}" data-act="goal" data-tab="${g.tab}">${ready ? 'Build!' : 'Open'}</button></div>${rows}</div>`;
   }
 
   // ---------- views ----------
@@ -591,10 +728,13 @@ window.SPR = (function () {
     const main = s.st === 'ready' ? `<button class="btn take" data-act="collect" data-id="${t.uid}">Collect</button>`
       : s.st === 'idle' ? `<button class="btn go" data-act="mine" data-id="${t.uid}">${d.res === 'food' ? 'Fish' : 'Mine'}</button>`
       : `<button class="btn" disabled>Working</button>`;
-    return `<article class="card paper ${s.st === 'work' ? 'working' : s.st === 'ready' ? 'ready' : ''}">
-      <div class="window"><span class="ribbon ${d.tc}">${d.tier}</span>${d.nft ? '<span class="nft">NFT</span>' : ''}<div class="spr">${spr(t.type)}</div></div>
+    const fx = s.st === 'work' ? `<span class="fx">${'<b></b>'.repeat(5)}</span>` : '';
+    const lk = lucky && lucky.uid === t.uid && s.st === 'work' ? `<button class="lucky" data-act="lucky" data-id="${t.uid}" aria-label="${LUCKY_TXT[d.res]} Tap to grab it">✨<small>${LUCKY_TXT[d.res]}</small></button>` : '';
+    const fast = s.st !== 'work' && d.res !== 'gold' && (t.runs || 0) < RAMP.length ? '<span class="fast">⚡ quick start</span>' : '';
+    return `<article class="card paper tool-${t.type} ${s.st === 'work' ? 'working' : s.st === 'ready' ? 'ready' : ''}">
+      <div class="window tier-${d.tier.toLowerCase()}"><span class="ribbon ${d.tc}">${d.tier}</span>${d.nft ? '<span class="nft">NFT</span>' : ''}<div class="spr">${spr(t.type)}</div>${fx}${lk}${fast}</div>
       <h3>${d.name}</h3>
-      <div class="stats"><span>${ic(d.res)}+${d.yield}<span class="sub">/${d.cycle}h</span></span><span>${ic('bolt')}${d.energy}</span></div>
+      <div class="stats"><span>${ic(d.res)}+${d.yield}<span class="sub">/${fmtCycle(s.st === 'work' && t.len ? t.len : cycleLen(t))}</span></span><span>${ic('bolt')}${d.energy}</span></div>
       ${d.wear ? `<div class="meter ${low ? 'low' : ''}" title="Durability"><i style="width:${durPct}%"></i><span>${t.dur} / ${d.dur}</span></div>` : '<div class="meter"><i style="width:100%;background:#b8a27a"></i><span>never breaks</span></div>'}
       <div class="meter time"><i data-prog="${t.uid}" style="width:${s.pct}%"></i><span data-left="${t.uid}">${s.st === 'idle' ? 'idle' : s.st === 'ready' ? 'ready!' : fmtDur(s.left)}</span></div>
       <div class="acts">${d.wear ? `<button class="btn sm" data-act="repair" data-id="${t.uid}" ${t.dur >= d.dur ? 'disabled' : ''} title="Repair: 1 gold per 4 durability"><span class="ico">${SPR.wrench()}</span>${cost || ''}</button>` : ''}${main}</div>
@@ -603,10 +743,10 @@ window.SPR = (function () {
   const sign = (title, sub) => `<div class="sign"><h2>${title}</h2>${sub ? `<small>${sub}</small>` : ''}</div>`;
 
   function vFarm() {
-    return `${sign('Tools', S.tools.length + ' / ' + slots() + ' slots')}
+    return `${goalCard()}${sign('Tools', S.tools.length + ' / ' + slots() + ' slots')}
       <div class="bar-row"><button class="btn sm" data-act="startAll">Start all</button><button class="btn sm take" data-act="collectAll">Collect all</button></div>
       <div class="grid">${S.tools.map(toolCard).join('')}</div>
-      <p class="tip">Finished work waits for you, but cycles don't stack. Repairs cost 1 gold per 4 durability.</p>`;
+      <p class="tip">Finished work waits for you, but cycles don't stack. Repairs cost 1 gold per 4 durability. While tools work, watch for ✨ lucky finds. This test version runs ${S.speed}× faster than the real game.</p>`;
   }
 
   function vGarden() {
@@ -657,15 +797,15 @@ window.SPR = (function () {
     }).join('');
 
     return `${sign('Plots', 'rare seeds: ' + S.rareSeeds)}<div class="grid">${beds}${newBed}</div>
-      <p class="tip">Water every 4 hours. Skip more than 8 hours and the crop withers.</p>
+      <p class="tip">Water every ${fmtCycle(4 * H)}. Skip more than ${fmtCycle(8 * H)} and the crop withers.</p>
       ${sign('Chicken Coop')}<div class="grid">${coop}${hens}</div>`;
   }
 
   function vShop() {
     const tools = Object.entries(TOOLS).filter(([, d]) => d.nft).map(([k, d]) => `<article class="card paper">
       <div class="window shop"><span class="ribbon ${d.tc}">${d.tier}</span><span class="nft">NFT</span><div class="spr">${spr(k)}</div></div>
-      <h3>${d.name}</h3><div class="stats"><span>${ic(d.res)}+${d.yield}<span class="sub">/${d.cycle}h</span></span><span>${ic('bolt')}${d.energy}</span></div>
-      <div class="stats sub">durability ${d.dur}</div>
+      <h3>${d.name}</h3><div class="stats"><span>${ic(d.res)}+${d.yield}<span class="sub">/${fmtCycle(d.cycle * H)}</span></span><span>${ic('bolt')}${d.energy}</span></div>
+      <div class="stats sub">≈${perHour(d)} ${RES_NAME[d.res]} per hour · durability ${d.dur}</div>
       <div class="acts"><button class="btn go" data-act="buyTool" data-type="${k}">$${d.price}</button></div></article>`).join('');
     const m = memberActive();
     const mem = Object.entries(MEMBER).map(([k, d]) => {
@@ -737,13 +877,14 @@ window.SPR = (function () {
   let sig = '';
   function signature() {
     const n = now();
-    return S.tab + '|' + S.tools.map(t => toolState(t).st).join('') + '|' + S.beds.length + '|' +
+    return S.tab + '|' + (lucky ? lucky.uid : '') + '|' + S.tools.map(t => toolState(t).st).join('') + '|' + S.beds.length + '|' +
       S.beds.map(b => b.planted ? Math.floor((n - b.last) / (4 * H)) + ':' + b.waters : 'e').join(',') + '|' +
       (S.coop.lastStep == null ? 0 : Math.min(1, Math.floor((n - S.coop.lastStep) / (4 * H)))) + '|' +
       S.hens.map(h => h.start == null ? 'h' : n - h.start >= 4 * H ? 'r' : 'w').join('');
   }
   function render() { renderHud(); document.getElementById('view').innerHTML = VIEWS[S.tab](); sig = signature(); save(); }
   function tick() {
+    luckyTick();
     if (signature() !== sig) { const y = window.scrollY; render(); window.scrollTo(0, y); return; }
     S.tools.forEach(t => {
       const s = toolState(t); if (s.st !== 'work') return;
